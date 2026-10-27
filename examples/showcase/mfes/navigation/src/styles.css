@@ -1,0 +1,12 @@
+/* Release 2.0: the shop's new look. Uses the shell's design tokens (--surface, --text, --muted, --border, --bg). */
+.nav__title { margin: 0 0 10px; font-size: 0.72rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.nav { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.nav__item {
+    display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border-radius: 999px;
+    color: inherit; text-decoration: none; font-weight: 600; transition: background 0.15s;
+}
+.nav__icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 999px; background: var(--bg); }
+.nav__item:hover { background: var(--bg); }
+.nav__item[aria-current="page"] { background: linear-gradient(135deg, #7c3aed, #db2777); color: #fff; box-shadow: 0 8px 20px -10px #db2777; }
+.nav__item[aria-current="page"] .nav__icon { background: rgb(255 255 255 / 0.22); }
+@media (prefers-reduced-motion: reduce) { .nav__item { transition: none; } }

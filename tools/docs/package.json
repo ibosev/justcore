@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "description": "Isolated docs toolchain: TypeDoc needs TypeScript's JS API, which TypeScript 7.0 lacks. Delete this folder once TypeDoc supports TypeScript 7.",
+  "scripts": {
+    "build": "typedoc"
+  },
+  "devDependencies": {
+    "typedoc": "0.28.20",
+    "typescript": "6.0.3"
+  }
+}

@@ -1,0 +1,156 @@
+:root {
+    --bg: #f5f5f4;
+    --surface: #ffffff;
+    --text: #1c1917;
+    --muted: #78716c;
+    --border: #e7e5e4;
+    --accent-strong: #4f46e5;
+    --on-accent: #ffffff;
+    --radius: 12px;
+    --vue: #2f855a;
+    --react: #0e7490;
+    --astro: #c2410c;
+    --svelte: #dc2626;
+    --solid: #2563eb;
+    --angular: #c026d3;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--text);
+    background: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0c0a09;
+        --surface: #1c1917;
+        --text: #f5f5f4;
+        --muted: #a8a29e;
+        --border: #292524;
+        --accent-strong: #818cf8;
+        --on-accent: #0c0a09;
+        --vue: #68d391;
+        --react: #67e8f9;
+        --astro: #fdba74;
+        --svelte: #fca5a5;
+        --solid: #93c5fd;
+        --angular: #f0abfc;
+    }
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); }
+h2 { margin: 0 0 12px; font-size: 1rem; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: 0.5; }
+:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+.empty, .hint { color: var(--muted); margin: 0; }
+.hint { font-size: 0.85rem; margin-bottom: 12px; }
+
+/* Layout: one region per module */
+.shell {
+    display: grid;
+    gap: 28px 20px;
+    padding: 28px 16px;
+    max-width: 1280px;
+    margin: 0 auto;
+    grid-template-columns: minmax(0, 1fr);
+}
+.column { display: grid; gap: 28px; align-content: start; }
+@media (min-width: 960px) {
+    .shell {
+        grid-template-columns: 200px minmax(0, 1fr) 340px;
+        grid-template-areas: "header header header" "nav catalog column" "inspector inspector inspector";
+        padding: 32px 24px;
+    }
+    .region--header { grid-area: header; }
+    .region--nav { grid-area: nav; align-self: start; }
+    .region--catalog { grid-area: catalog; }
+    .column { grid-area: column; }
+    .region--inspector { grid-area: inspector; }
+}
+
+.region {
+    --framework: var(--muted);
+    position: relative;
+    min-height: 72px;
+    padding: 20px 16px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--framework);
+    border-radius: var(--radius);
+    transition: opacity 0.2s;
+}
+.region::before {
+    content: attr(data-framework) " · " attr(data-module) " · " attr(data-source);
+    position: absolute;
+    top: -11px;
+    left: 12px;
+    max-width: calc(100% - 24px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--surface);
+    background: var(--framework);
+}
+/* The running release, set by the shell on every start, so a swap shows up in the label. */
+.region[data-version]::before { content: attr(data-framework) " · " attr(data-module) " " attr(data-version) " · " attr(data-source); }
+.region[data-framework="Vue"] { --framework: var(--vue); }
+.region[data-framework="React"] { --framework: var(--react); }
+.region[data-framework="Astro"] { --framework: var(--astro); }
+.region[data-framework="Svelte"] { --framework: var(--svelte); }
+.region[data-framework="SolidJS"] { --framework: var(--solid); }
+.region[data-framework="Angular"] { --framework: var(--angular); }
+.region[data-state="stopped"], .region[data-state="failed"] { border-style: dashed; }
+.region[data-state="stopped"] { opacity: 0.55; }
+.region[data-state="failed"] { border-color: var(--svelte); }
+.region[data-state="loading"]::after, .region[data-state="stopped"]::after {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+.region[data-state="loading"]::after { content: "loading from " attr(data-source) "…"; }
+.region[data-state="stopped"]::after { content: "module stopped"; }
+/* The module's error boundary: only this region shows the failure; the rest of the page keeps running. */
+.region[data-state="failed"]::after {
+    content: "⚠ " attr(data-module) " " attr(data-version) " failed: " attr(data-error) "\A The rest of the page keeps running. Start it again in the inspector, or publish a fix.";
+    display: block;
+    white-space: pre-line;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--svelte);
+    background: color-mix(in srgb, var(--svelte) 10%, transparent);
+}
+
+/* Shell controls, used by the inspector */
+.secondary { border-radius: 8px; padding: 6px 12px; background: transparent; border: 1px solid var(--border); }
+
+/* Inspector */
+.inspector { display: grid; gap: 24px; }
+.inspector > section { min-width: 0; }
+@media (min-width: 960px) { .inspector { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.inspector__scroll { overflow-x: auto; }
+.modules code { font-size: 0.8rem; color: var(--muted); overflow-wrap: anywhere; }
+.modules td:last-child { display: flex; flex-wrap: wrap; gap: 6px; }
+.update { border-radius: 8px; padding: 6px 12px; border: 0; background: var(--accent-strong); color: var(--on-accent); font-size: 0.8rem; }
+.size { display: block; font-size: 0.75rem; color: var(--muted); }
+.toggle { display: flex; gap: 8px; align-items: center; font-size: 0.9rem; margin-bottom: 8px; }
+.inspector__subhead { margin-top: 20px; }
+.rejected { display: block; font-size: 0.8rem; color: var(--svelte); }
+.modules { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.modules th { text-align: left; color: var(--muted); font-weight: 500; padding: 4px 6px; }
+.modules td { padding: 6px; border-top: 1px solid var(--border); }
+.status { font-size: 0.8rem; color: var(--muted); }
+.status[data-running="true"] { color: var(--vue); font-weight: 600; }
+.events { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 260px; overflow: auto; font-size: 0.85rem; }
+.event { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; padding: 6px 8px; border-radius: 8px; background: var(--bg); }
+.event time { color: var(--muted); font-variant-numeric: tabular-nums; }
+.event[data-kind="message"] .event__label { color: var(--accent-strong); font-weight: 600; }
+.event code { grid-column: 2; color: var(--muted); overflow-wrap: anywhere; }

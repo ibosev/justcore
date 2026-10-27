@@ -241,3 +241,11 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+.test-build
+.build
+/tools/docs/node_modules
+
+# Local working notes and browser-automation output, not part of the library
+/research/
+/.playwright-mcp/
+.claude/

@@ -4,422 +4,308 @@
  *  Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
  *  Source code: http://github.com/valentin-lozev/justcore
  */
+var VERSION = "3.0.0";
 
-var VERSION = "2.0.0";
-
-var errorCodes = {
-    m1: function () { return "use(): extensions must be installed before init"; },
-    m2: function () { return "use(): extensions must be passed as an array"; },
-    m3: function () { return "use(): extension must be an object"; },
-    m4: function () { return "use(): extension name must be a non empty string"; },
-    m5: function (id) { return "use(): \"" + id + "\" install must be a function"; },
-    m6: function (id) { return "use(): \"" + id + "\" has already been used"; },
-    m7: function () { return "init(): core has already been initialized"; },
-    m8: function () { return "addModule(): id must be a non empty string"; },
-    m9: function (id) { return "addModule(): \"" + id + "\" has already been added"; },
-    m10: function (id) { return "addModule(): \"" + id + "\" factory must be a function"; },
-    m11: function () { return "startModule(): core must be initialized first"; },
-    m12: function (id) { return "startModule(): \"" + id + "\" not found"; },
-    m13: function (id) { return "startModule(): \"" + id + "\"'s sandbox property must be a Sandbox instance"; },
-    m14: function (id) { return "startModule(): \"" + id + "\" init hook must be defined"; },
-    m15: function (id) { return "startModule(): \"" + id + "\" destroy hook must be defined"; },
-    m16: function () { return "createHook(): type must be a non empty string"; },
-    m17: function (id) { return "createHook(): \"" + id + "\" method must be a function"; },
-    m18: function () { return "addPlugin(): hook type must be a non empty string"; },
-    m19: function (id) { return "addPlugin(): \"" + id + "\" plugin must be a function"; },
-    m20: function () { return "onMessage(): message type must be a non empty string"; },
-    m21: function (id) { return "onMessage(): \"" + id + "\" handler should be a function"; },
-    m22: function () { return "publishAsync(): message must be an object"; },
-    m23: function (id) { return "\"" + id + "\" moduleDidReceiveMessage hook must be defined in order to subscribe"; },
-    m24: function () { return "addService(): key must be a non empty string"; },
-    m25: function (key) { return "addService(): \"" + key + "\" has already been added"; },
-    m26: function (key) { return "addService(): \"" + key + "\" factory must be a function that returns service instance"; },
-    m27: function (key) { return "getService(): " + key + " service not found"; },
+const errorCodes = {
+    m1: () => "use(): extensions must be installed before init",
+    m2: () => "use(): extensions must be passed as an array",
+    m3: () => "use(): extension must be an object",
+    m4: () => "use(): extension name must be a non empty string",
+    m5: (id) => `use(): "${id}" install must be a function`,
+    m6: (id) => `use(): "${id}" has already been used`,
+    m7: () => "init(): core has already been initialized",
+    m8: () => "addModule(): id must be a non empty string",
+    m9: (id) => `addModule(): "${id}" has already been added`,
+    m10: (id) => `addModule(): "${id}" factory must be a function`,
+    m11: () => "startModule(): core must be initialized first",
+    m12: (id) => `startModule(): "${id}" not found`,
+    m13: (id) => `startModule(): "${id}"'s sandbox property must be the sandbox passed to its factory`,
+    m14: (id) => `startModule(): "${id}" init hook must be defined`,
+    m15: (id) => `startModule(): "${id}" destroy hook must be defined`,
+    m16: () => "createHook(): type must be a non empty string",
+    m17: (id) => `createHook(): "${id}" method must be a function`,
+    m18: () => "addPlugin(): hook type must be a non empty string",
+    m19: (id) => `addPlugin(): "${id}" plugin must be a function`,
+    m20: () => "onMessage(): message type must be a non empty string",
+    m21: (id) => `onMessage(): "${id}" handler should be a function`,
+    m22: () => "publishAsync(): message must be an object",
+    m23: (id) => `"${id}" moduleDidReceiveMessage hook must be defined in order to subscribe`,
+    m24: () => "addService(): key must be a non empty string",
+    m25: (key) => `addService(): "${key}" has already been added`,
+    m26: (key) => `addService(): "${key}" factory must be a function that returns service instance`,
+    m27: (key) => `getService(): ${key} service not found`,
+    m28: () => "remoteModule(): load must be a function",
+    m29: () => "remoteModule(): loaded code must export a module factory as its default export",
+    m30: (id) => `startModule(): "${id}" factory must return a module object`,
 };
 function throwError(code, formatId) {
-    var msgCreator = errorCodes[code];
+    const msgCreator = errorCodes[code];
     throw new Error(msgCreator(formatId));
 }
-var ArgumentGuard = /** @class */ (function () {
-    function ArgumentGuard() {
-    }
-    ArgumentGuard.prototype.array = function (arg, code, formatId) {
+class ArgumentGuard {
+    array(arg, code, formatId) {
         if (!Array.isArray(arg)) {
             throwError(code, formatId);
         }
         return this;
-    };
-    ArgumentGuard.prototype.object = function (arg, code, formatId) {
+    }
+    object(arg, code, formatId) {
         if (typeof arg !== "object" || arg === null) {
             throwError(code, formatId);
         }
         return this;
-    };
-    ArgumentGuard.prototype.function = function (arg, code, formatId) {
+    }
+    function(arg, code, formatId) {
         if (typeof arg !== "function") {
             throwError(code, formatId);
         }
         return this;
-    };
-    ArgumentGuard.prototype.nonEmptyString = function (arg, code, formatId) {
+    }
+    nonEmptyString(arg, code, formatId) {
         if (typeof arg !== "string" || !arg.length) {
             throwError(code, formatId);
         }
         return this;
-    };
-    ArgumentGuard.prototype.true = function (arg, code, formatId) {
+    }
+    true(arg, code, formatId) {
         if (!arg) {
             throwError(code, formatId);
         }
         return this;
-    };
-    ArgumentGuard.prototype.false = function (arg, code, formatId) {
+    }
+    false(arg, code, formatId) {
         if (arg) {
             throwError(code, formatId);
         }
         return this;
-    };
-    return ArgumentGuard;
-}());
-var guard = new ArgumentGuard();
+    }
+}
+const guard = new ArgumentGuard();
 function isDocumentReady() {
-    var state = document.readyState;
+    const state = document.readyState;
     return state === "complete" ||
         state === "interactive" ||
         state === "loaded"; /* old safari browsers */
 }
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-var lastUID = 0;
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+let lastUID = 0;
 function uid() {
     return ++lastUID;
 }
-
-function subscribe() {
-    var core = this.sandbox._extensionsOnlyCore;
-    var messages = typeof this.moduleWillSubscribe === "function"
-        ? core.createHook("onModuleSubscribe", this.moduleWillSubscribe, this)()
-        : null;
-    var anyMessages = Array.isArray(messages) && messages.length >= 0;
-    if (!anyMessages) {
-        return;
-    }
-    guard.function(this.moduleDidReceiveMessage, "m23", this.sandbox.moduleId);
-    var moduleDidReceiveMessage = core.createHook("onModuleReceiveMessage", this.moduleDidReceiveMessage, this);
-    this.sandbox._unsubscribers = messages.reduce(function (map, message) {
-        map[message] = core.onMessage(message, moduleDidReceiveMessage);
-        return map;
-    }, Object.create(null));
+function noop() { }
+/** Runs next after value settles: synchronously for plain values, chained for promises and thenables. */
+function then(value, next) {
+    return isThenable(value) ? Promise.resolve(value).then(next) : next(value);
 }
-function unsubscribe() {
-    var unsubscribers = this.sandbox._unsubscribers;
-    if (unsubscribers) {
-        Object
-            .keys(unsubscribers)
-            .forEach(function (message) {
-            unsubscribers[message]();
-            unsubscribers[message] = null;
-            delete unsubscribers[message];
-        });
-    }
-}
-function moduleAutosubscribe() {
-    return {
-        name: "module-autosubscribe",
-        install: function () { return ({
-            onModuleInit: function (next) {
-                next();
-                subscribe.call(this);
-            },
-            onModuleDestroy: function (next) {
-                unsubscribe.call(this);
-                next();
-            }
-        }); }
-    };
+function isThenable(value) {
+    return !!value && typeof value.then === "function";
 }
 
-/* tslint:disable */
-if (typeof Array.prototype.reduceRight !== "function") {
-    Array.prototype.reduceRight = function (callback /*, initialValue*/) {
-        if (null === this || "undefined" === typeof this) {
-            throw new TypeError("Array.prototype.reduce called on null or undefined");
-        }
-        if ("function" !== typeof callback) {
-            throw new TypeError(callback + " is not a function");
-        }
-        var t = Object(this), len = t.length >>> 0, k = len - 1, value;
-        if (arguments.length >= 2) {
-            value = arguments[1];
-        }
-        else {
-            while (k >= 0 && !(k in t)) {
-                k--;
-            }
-            if (k < 0) {
-                throw new TypeError("Reduce of empty array with no initial value");
-            }
-            value = t[k--];
-        }
-        for (; k >= 0; k--) {
-            if (k in t) {
-                value = callback(value, t[k], k, t);
-            }
-        }
-        return value;
-    };
-}
-
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation. All rights reserved.
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0
-
-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-MERCHANTABLITY OR NON-INFRINGEMENT.
-
-See the Apache Version 2.0 License for specific language governing permissions
-and limitations under the License.
-***************************************************************************** */
-
-function __spreadArrays() {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-}
-
-var HooksSystem = /** @class */ (function () {
-    function HooksSystem() {
+class HooksSystem {
+    constructor() {
         this._plugins = Object.create(null);
     }
-    HooksSystem.prototype.createHook = function (type, method, context) {
+    createHook(type, method, context) {
         guard
             .nonEmptyString(type, "m16")
             .function(method, "m17", type);
-        var hooksContext = this;
-        var result = function () {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i] = arguments[_i];
-            }
-            var plugins = hooksContext._plugins[type];
+        const hooksContext = this;
+        return function (...args) {
+            const plugins = hooksContext._plugins[type];
             if (!plugins) {
                 return method.apply(context, args);
             }
-            return plugins.reduceRight(function (pipeline, plugin) { return function () { return plugin.apply(context, __spreadArrays([pipeline], args)); }; }, function () { return method.apply(context, args); })();
+            return plugins.reduceRight((pipeline, plugin) => () => {
+                let nextResult;
+                const next = () => (nextResult = pipeline());
+                const result = plugin.apply(context, [next, ...args]);
+                // Plugins written for synchronous lifecycles call next() without returning it;
+                // pass the promise through so asynchronous init, destroy, start and stop are still awaited.
+                return result === undefined && isThenable(nextResult) ? nextResult : result;
+            }, () => method.apply(context, args))();
         };
-        result._withPipeline = true;
-        result._hookType = type;
-        return result;
-    };
-    HooksSystem.prototype.addPlugin = function (hookType, plugin) {
+    }
+    addPlugin(hookType, plugin) {
         guard
             .nonEmptyString(hookType, "m18")
             .function(plugin, "m19", hookType);
         (this._plugins[hookType] || (this._plugins[hookType] = [])).push(plugin);
-    };
-    return HooksSystem;
-}());
+    }
+}
 
-var MessageBus = /** @class */ (function () {
-    function MessageBus() {
+class MessageBus {
+    constructor() {
         this._subscribers = Object.create(null);
     }
-    MessageBus.prototype.onMessage = function (type, handler) {
+    onMessage(type, handler) {
         guard
             .nonEmptyString(type, "m20")
             .function(handler, "m21", type);
         return this._addSubscriber(type, handler);
-    };
-    MessageBus.prototype.publishAsync = function (message) {
-        var _this = this;
+    }
+    publishAsync(message) {
         guard.true(typeof message === "object", "m22");
         if (!(message.type in this._subscribers)) {
             return;
         }
-        var subscriptions = this._subscribers[message.type];
-        Object.keys(subscriptions).forEach(function (id) {
-            _this._publishSingle(message, subscriptions[id]);
+        const subscriptions = this._subscribers[message.type];
+        Object.keys(subscriptions).forEach(id => {
+            this._publishSingle(message, subscriptions, id);
         });
-    };
-    MessageBus.prototype._publishSingle = function (message, handler) {
-        setTimeout(function () {
+    }
+    _publishSingle(message, subscriptions, id) {
+        setTimeout(() => {
+            // Look the handler up at delivery time: it may have unsubscribed after publish.
+            const handler = subscriptions[id];
+            if (!handler) {
+                return;
+            }
             try {
                 handler(message);
             }
             catch (err) {
-                console.error("publishAsync(): Receive \"" + message.type + "\" message failed.");
+                console.error(`publishAsync(): Receive "${message.type}" message failed.`);
                 console.error(err);
             }
         }, 0);
-    };
-    MessageBus.prototype._addSubscriber = function (type, handler) {
-        var _this = this;
+    }
+    _addSubscriber(type, handler) {
         if (!(type in this._subscribers)) {
             this._subscribers[type] = Object.create(null);
         }
-        var subscriptionId = uid();
+        const subscriptionId = uid();
         this._subscribers[type][subscriptionId] = handler;
-        return function () {
-            _this._subscribers[type][subscriptionId] = null;
-            delete _this._subscribers[type][subscriptionId];
+        return () => {
+            delete this._subscribers[type][subscriptionId];
         };
-    };
-    return MessageBus;
-}());
+    }
+}
 
-var Sandbox = /** @class */ (function () {
-    function Sandbox(core, moduleId, instanceId) {
-        this._extensionsOnlyCore = core;
+class Sandbox {
+    constructor(core, moduleId, instanceId, signal = new AbortController().signal) {
+        this._core = core;
         this._moduleId = moduleId;
         this._instanceId = instanceId;
+        this._signal = signal;
     }
-    Object.defineProperty(Sandbox.prototype, "moduleId", {
-        get: function () {
-            return this._moduleId;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Sandbox.prototype, "instanceId", {
-        get: function () {
-            return this._instanceId;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Sandbox.prototype.startModule = function (id, options) {
-        this._extensionsOnlyCore.startModule(id, options);
-    };
-    Sandbox.prototype.stopModule = function (id, instanceId) {
-        this._extensionsOnlyCore.stopModule(id, instanceId);
-    };
-    Sandbox.prototype.publishAsync = function (message) {
-        this._extensionsOnlyCore.publishAsync(message);
-    };
-    Sandbox.prototype.getService = function (key) {
-        return this._extensionsOnlyCore.serviceLocator.getService(key);
-    };
-    return Sandbox;
-}());
+    get moduleId() {
+        return this._moduleId;
+    }
+    get instanceId() {
+        return this._instanceId;
+    }
+    get signal() {
+        return this._signal;
+    }
+    startModule(id, options) {
+        return this._core.startModule(id, options);
+    }
+    stopModule(id, instanceId) {
+        return this._core.stopModule(id, instanceId);
+    }
+    publishAsync(message) {
+        this._core.publishAsync(message);
+    }
+    getService(key) {
+        return this._core.serviceLocator.getService(key);
+    }
+}
 
-var ServiceLocator = /** @class */ (function () {
-    function ServiceLocator() {
+class ServiceLocator {
+    constructor() {
         this.container = Object.create(null);
         this.instantiationsStack = [];
     }
-    ServiceLocator.prototype.addService = function (key, factory) {
+    addService(key, factory) {
         guard.nonEmptyString(key, "m24")
             .false(hasOwnProperty.call(this.container, key), "m25", key)
             .function(factory, "m26", key);
         this.container[key] = {
             factory: factory,
-            instance: null
+            instance: null,
+            created: false
         };
-    };
-    ServiceLocator.prototype.getService = function (key) {
-        var serviceData = this.container[key];
+    }
+    getService(key) {
+        const serviceData = this.container[key];
         guard.true(!!serviceData, "m27", key);
-        if (serviceData.instance) {
+        if (serviceData.created) {
             return serviceData.instance;
         }
         if (this.isServiceBeingInstantiated(key)) {
-            throw new Error("getService(): service circular dependency " + this.instantiationsStack.join(" -> ") + " -> " + key);
+            throw new Error(`getService(): service circular dependency ${this.instantiationsStack.join(" -> ")} -> ${key}`);
         }
         this.instantiationsStack.push(key);
         try {
             serviceData.instance = serviceData.factory();
+            serviceData.created = true;
         }
         finally {
             this.instantiationsStack.pop();
         }
         return serviceData.instance;
-    };
-    ServiceLocator.prototype.isServiceBeingInstantiated = function (key) {
+    }
+    isServiceBeingInstantiated(key) {
         return this.instantiationsStack.indexOf(key) > -1;
-    };
-    return ServiceLocator;
-}());
+    }
+}
 
-var Core = /** @class */ (function () {
-    function Core(hooksSystem, messageBus, serviceLocator) {
-        if (hooksSystem === void 0) { hooksSystem = new HooksSystem(); }
-        if (messageBus === void 0) { messageBus = new MessageBus(); }
-        if (serviceLocator === void 0) { serviceLocator = new ServiceLocator(); }
-        this.Sandbox = Sandbox;
+class Core {
+    constructor() {
+        // A subclass per core, so an extension that augments its prototype does not reach other cores.
+        this.Sandbox = class extends Sandbox {
+        };
+        this.serviceLocator = new ServiceLocator();
         this._isInitialized = false;
-        this._onInit = null;
-        this._hooksSystem = null;
-        this._messageBus = null;
+        this._onInit = () => { };
+        this._hooksSystem = new HooksSystem();
+        this._messageBus = new MessageBus();
         this._extensions = Object.create(null);
         this._modules = Object.create(null);
-        this._hooksSystem = hooksSystem;
-        this._messageBus = messageBus;
-        this.serviceLocator = serviceLocator;
         this._onDomReady = this._onDomReady.bind(this);
-        this.use([
-            // built-in extensions
-            moduleAutosubscribe()
-        ]);
+        // Hooked from the start, so a call behaves the same before and after init.
+        this.addModule = this.createHook("onModuleAdd", this.addModule, this);
+        this.startModule = this.createHook("onModuleStart", this.startModule, this);
+        this.stopModule = this.createHook("onModuleStop", this.stopModule, this);
+        this.onMessage = this.createHook("onMessageSubscribe", this.onMessage, this);
+        this.publishAsync = this.createHook("onMessagePublish", this.publishAsync, this);
     }
-    Object.defineProperty(Core.prototype, "version", {
-        get: function () {
-            return VERSION;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Core.prototype, "extensions", {
-        get: function () {
-            return Object.keys(this._extensions);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Core.prototype, "modules", {
-        get: function () {
-            return Object.keys(this._modules);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Core.prototype, "runningModules", {
-        get: function () {
-            var _this = this;
-            return this.modules
-                .reduce(function (result, id) {
-                result[id] = Object.keys(_this._modules[id].instances);
-                return result;
-            }, Object.create(null));
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Core.prototype.use = function (extensions) {
-        var _this = this;
+    get version() {
+        return VERSION;
+    }
+    get extensions() {
+        return Object.keys(this._extensions);
+    }
+    get modules() {
+        return Object.keys(this._modules);
+    }
+    get runningModules() {
+        return this.modules
+            .reduce((result, id) => {
+            const instances = this._modules[id].instances;
+            result[id] = Object.keys(instances).filter(instanceId => instances[instanceId].running);
+            return result;
+        }, Object.create(null));
+    }
+    use(extensions) {
         guard
             .false(this._isInitialized, "m1")
             .array(extensions, "m2");
-        extensions.forEach(function (x) {
+        extensions.forEach(x => {
             guard
                 .object(x, "m3")
                 .nonEmptyString(x.name, "m4")
                 .function(x.install, "m5", x.name)
-                .false(x.name in _this._extensions, "m6", x.name);
-            _this._extensions[x.name] = x;
+                .false(x.name in this._extensions, "m6", x.name);
+            this._extensions[x.name] = x;
         });
-    };
-    Core.prototype.createHook = function (type, method, context) {
+    }
+    createHook(type, method, context) {
         return this._hooksSystem.createHook(type, method, context);
-    };
-    Core.prototype.init = function (onInit) {
+    }
+    init(onInit) {
         guard.false(this._isInitialized, "m7");
         this._onInit = this.createHook("onCoreInit", onInit || function () { }, this);
-        this._createHooks();
         this._installExtensions();
         if (isDocumentReady()) {
             setTimeout(this._onDomReady, 0);
@@ -428,8 +314,8 @@ var Core = /** @class */ (function () {
             document.addEventListener("DOMContentLoaded", this._onDomReady);
         }
         this._isInitialized = true;
-    };
-    Core.prototype.addModule = function (id, factory) {
+    }
+    addModule(id, factory) {
         guard
             .nonEmptyString(id, "m8")
             .false(id in this._modules, "m9")
@@ -438,102 +324,163 @@ var Core = /** @class */ (function () {
             factory: factory,
             instances: Object.create(null)
         };
-    };
-    Core.prototype.startModule = function (id, options) {
-        if (options === void 0) { options = {}; }
+    }
+    startModule(id, options = {}) {
         guard.true(this._isInitialized, "m11")
             .true(id in this._modules, "m12", id);
-        var moduleData = this._modules[id];
-        var instanceId = options.instanceId || id;
-        var instance = moduleData.instances[instanceId];
-        if (instance) {
-            if (typeof instance.moduleDidReceiveProps === "function") {
-                this.createHook("onModuleReceiveProps", instance.moduleDidReceiveProps, instance)(options.props);
+        const moduleData = this._modules[id];
+        const instanceId = options.instanceId || id;
+        const existing = moduleData.instances[instanceId];
+        if (existing) {
+            const running = existing.module;
+            if (existing.running && running && typeof running.moduleDidReceiveProps === "function") {
+                this.createHook("onModuleReceiveProps", running.moduleDidReceiveProps, running)(options.props);
             }
-            return;
+            return existing.ready;
         }
-        instance = this._createModule(id, instanceId, moduleData.factory);
-        if (!instance) {
-            return;
-        }
+        const controller = new AbortController();
+        const sandbox = new this.Sandbox(this, id, instanceId, controller.signal);
+        let settle;
+        // Registered before the factory and init run, so a reentrant start or stop finds this instance instead of creating another.
+        const instance = {
+            controller,
+            running: false,
+            ready: new Promise(resolve => { settle = resolve; })
+        };
+        moduleData.instances[instanceId] = instance;
+        let initialized = false;
+        const failed = (err) => {
+            if (moduleData.instances[instanceId] === instance) {
+                delete moduleData.instances[instanceId];
+            }
+            controller.abort();
+            // Init finished but a later step (e.g. subscribing) failed: let the module undo its own work, then report.
+            return Promise.resolve(initialized ? this._destroy(id, instance.module) : undefined)
+                .then(() => Promise.reject(err));
+        };
+        let result;
         try {
-            this.createHook("onModuleInit", instance.init, instance)(options.props);
-            moduleData.instances[instanceId] = instance;
+            result = Promise.resolve(then(moduleData.factory(sandbox), (module) => {
+                guard
+                    .object(module, "m30", id)
+                    .true(module.sandbox === sandbox, "m13", id)
+                    .function(module.init, "m14", id)
+                    .function(module.destroy, "m15", id);
+                instance.module = module;
+                const init = (props) => then(module.init(props), () => { initialized = true; });
+                return then(this.createHook("onModuleInit", init, module)(options.props), () => {
+                    this._subscribe(id, module, controller.signal);
+                    instance.running = true;
+                });
+            })).then(noop, failed);
         }
         catch (err) {
-            console.error("startModule(): \"" + id + "\" init failed");
-            console.error(err);
+            result = failed(err);
         }
-    };
-    Core.prototype.stopModule = function (id, instanceId) {
-        var moduleData = this._modules[id];
+        settle(result);
+        return instance.ready;
+    }
+    stopModule(id, instanceId) {
+        const moduleData = this._modules[id];
         if (!moduleData) {
-            console.warn("stopModule(): \"" + id + "\" not found");
-            return;
+            console.warn(`stopModule(): "${id}" not found`);
+            return Promise.resolve();
         }
-        instanceId = instanceId || id;
-        if (!(instanceId in moduleData.instances)) {
-            console.warn("stopModule(): \"" + id + "\"'s \"" + instanceId + "\" instance is not running");
-            return;
+        const key = instanceId || id;
+        const instance = moduleData.instances[key];
+        if (!instance) {
+            console.warn(`stopModule(): "${id}"'s "${key}" instance is not running`);
+            return Promise.resolve();
         }
-        try {
-            var instance = moduleData.instances[instanceId];
-            this.createHook("onModuleDestroy", instance.destroy, instance)();
-            delete moduleData.instances[instanceId];
+        if (!instance.running) {
+            // Start is still pending: let it finish, then stop the instance if it actually started.
+            return instance.ready.then(() => {
+                if (moduleData.instances[key] === instance) {
+                    return this._stop(id, moduleData, key, instance);
+                }
+            }, noop);
         }
-        catch (err) {
-            console.error("stopModule(): \"" + id + "\" destroy failed");
-            console.error(err);
-        }
-    };
-    Core.prototype.onMessage = function (type, handler) {
+        return this._stop(id, moduleData, key, instance);
+    }
+    onMessage(type, handler) {
         return this._messageBus.onMessage(type, handler);
-    };
-    Core.prototype.publishAsync = function (message) {
+    }
+    publishAsync(message) {
         this._messageBus.publishAsync(message);
-    };
-    Core.prototype._createHooks = function () {
-        this.addModule = this.createHook("onModuleAdd", this.addModule, this);
-        this.startModule = this.createHook("onModuleStart", this.startModule, this);
-        this.stopModule = this.createHook("onModuleStop", this.stopModule, this);
-        this.onMessage = this.createHook("onMessageSubscribe", this.onMessage, this);
-        this.publishAsync = this.createHook("onMessagePublish", this.publishAsync, this);
-    };
-    Core.prototype._installExtensions = function () {
-        var _this = this;
+    }
+    _installExtensions() {
         Object
             .keys(this._extensions)
-            .forEach(function (name) { return _this._install(_this._extensions[name]); });
-    };
-    Core.prototype._install = function (extension) {
-        var _this = this;
-        var plugins = extension.install(this) || {};
-        Object
-            .keys(plugins)
-            .forEach(function (hookType) {
-            return _this._hooksSystem.addPlugin(hookType, plugins[hookType]);
-        });
-    };
-    Core.prototype._onDomReady = function () {
+            .forEach(name => this._install(this._extensions[name]));
+    }
+    _install(extension) {
+        const plugins = extension.install(this) || {};
+        Object.keys(plugins)
+            .forEach(hookType => this._hooksSystem.addPlugin(hookType, plugins[hookType]));
+    }
+    _onDomReady() {
         document.removeEventListener("DOMContentLoaded", this._onDomReady);
         this._onInit();
-    };
-    Core.prototype._createModule = function (id, instanceId, factory) {
-        var result = null;
+    }
+    _subscribe(id, module, signal) {
+        const messages = typeof module.moduleWillSubscribe === "function"
+            ? this.createHook("onModuleSubscribe", module.moduleWillSubscribe, module)()
+            : null;
+        if (!Array.isArray(messages) || !messages.length) {
+            return;
+        }
+        guard.function(module.moduleDidReceiveMessage, "m23", id);
+        const handler = this.createHook("onModuleReceiveMessage", module.moduleDidReceiveMessage, module);
+        // The signal aborts on stop and on failed start, so every subscription made here is released.
+        // Each listener is a fresh closure: EventTarget silently drops a listener that is already registered.
+        messages.forEach(type => {
+            const unsubscribe = this.onMessage(type, handler);
+            signal.addEventListener("abort", () => unsubscribe(), { once: true });
+        });
+    }
+    _stop(id, moduleData, instanceId, instance) {
+        // Untrack and release resources first, so a failing destroy cannot leave a half-stopped instance.
+        delete moduleData.instances[instanceId];
+        instance.controller.abort();
+        return this._destroy(id, instance.module);
+    }
+    _destroy(id, module) {
+        const failed = (err) => {
+            console.error(`stopModule(): "${id}" destroy failed`);
+            console.error(err);
+        };
         try {
-            result = factory(new this.Sandbox(this, id, instanceId));
-            guard
-                .true(result.sandbox instanceof this.Sandbox, "m13", id)
-                .function(result.init, "m14", id)
-                .function(result.destroy, "m15", id);
+            return Promise.resolve(this.createHook("onModuleDestroy", module.destroy, module)()).then(noop, failed);
         }
         catch (err) {
-            result = null;
-            console.error(err);
+            failed(err);
+            return Promise.resolve();
         }
-        return result;
-    };
-    return Core;
-}());
+    }
+}
 
-export { Core };
+/**
+ * Creates a module whose code is loaded on its first start, e.g. an independently deployed bundle on a CDN.
+ * `load` resolves to a module factory, or to an ES module whose default export is one:
+ * `core.addModule("cart", remoteModule(() => import("https://cdn.example.com/cart.3f2a9c.js")))`.
+ * A failed load fails that start like a failed init does, and the next start retries it.
+ * The load function stays in the caller's code, so its bundler, import map or federation runtime resolves it.
+ */
+function remoteModule(load) {
+    guard.function(load, "m28");
+    let loading;
+    return sandbox => (loading || (loading = load()
+        .then(source => {
+        const create = typeof source === "function" ? source : source && source.default;
+        guard.function(create, "m29");
+        return create;
+    })
+        .catch(err => {
+        // A failed download is not cached by the browser either, so the next start retries it.
+        loading = undefined;
+        throw err;
+    })))
+        .then(create => create(sandbox));
+}
+
+export { Core, remoteModule };

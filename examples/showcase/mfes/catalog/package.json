@@ -1,0 +1,24 @@
+{
+  "name": "@showcase/mfe-catalog",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Catalog micro frontend (Astro). Astro renders the product grid to HTML at build time; a small module inlines it and wires it to the URL.",
+  "scripts": {
+    "build": "astro build && vite build",
+    "test": "node --test \"src/*.test.ts\"",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "7.3.8",
+    "nanostores": "1.5.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@showcase/contracts": "1.0.0",
+    "@types/node": "24.10.1",
+    "justcore": "file:../../../..",
+    "typescript": "6.0.3",
+    "vite": "8.3.4"
+  }
+}

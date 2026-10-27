@@ -1,0 +1,26 @@
+/* Release 2.0: the shop's new look. Uses the shell's design tokens (--surface, --text, --muted, --border, --bg). */
+mfe-recommendations { --v2: linear-gradient(135deg, #7c3aed, #db2777); display: block; }
+.recs__head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.recs__head h2 { margin: 0; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; }
+.recs__count { font-size: 0.75rem; font-weight: 700; color: #db2777; text-transform: uppercase; letter-spacing: 0.08em; }
+.recs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.recs__item { position: relative; }
+.recs__show {
+    display: grid; gap: 4px; width: 100%; padding: 0 0 8px; text-align: left;
+    background: none; border: 0; border-radius: 14px; color: inherit;
+}
+.recs__tile {
+    display: grid; place-items: center; aspect-ratio: 1; border-radius: 14px; margin-bottom: 4px;
+    background: linear-gradient(160deg, var(--accent), color-mix(in srgb, var(--accent) 40%, #000));
+    color: #fff; font-size: 1.6rem; font-weight: 800; transition: transform 0.15s;
+}
+.recs__show:hover .recs__tile { transform: scale(1.04); }
+.recs__name { font-size: 0.82rem; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+.recs__price { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.recs__add {
+    position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border: 0; border-radius: 999px;
+    background: var(--v2); color: #fff; font-size: 1.1rem; font-weight: 800; line-height: 1;
+    box-shadow: 0 4px 12px -4px #db2777;
+}
+.recs__empty { margin: 0; padding: 14px; border-radius: 14px; background: var(--bg); color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .recs__tile { transition: none; } }

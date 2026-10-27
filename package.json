@@ -1,11 +1,11 @@
 {
-  "version": "2.0.0",
+  "version": "3.0.0",
   "name": "justcore",
   "main": "dist/justcore.umd.js",
   "umd:main": "dist/justcore.umd.js",
   "jsnext:main": "dist/justcore.module.js",
   "module": "dist/justcore.module.js",
-  "typings": "dist/justcore.d.ts",
+  "typings": "dist/types/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/valentin-lozev/justcore.git"
@@ -21,28 +21,18 @@
     "typescript"
   ],
   "devDependencies": {
-    "@types/jasmine": "3.5.0",
-    "fs-extra": "8.1.0",
-    "jasmine-core": "3.5.0",
-    "karma": "4.4.1",
-    "karma-coverage": "2.0.1",
-    "karma-coveralls": "2.1.0",
-    "karma-jasmine": "2.0.1",
-    "karma-mocha-reporter": "2.2.5",
-    "karma-phantomjs-launcher": "1.0.4",
-    "path": "0.12.7",
-    "rollup": "1.27.5",
-    "rollup-plugin-multi-entry": "2.1.0",
-    "rollup-plugin-tslint": "0.2.2",
-    "rollup-plugin-typescript2": "0.25.2",
-    "rollup-plugin-uglify": "6.0.3",
-    "typedoc": "0.15.3",
-    "typedoc-plugin-external-module-name": "2.1.0",
-    "typescript": "3.7.2"
+    "@rollup/plugin-terser": "1.0.0",
+    "@types/jasmine": "7.0.0",
+    "jasmine": "7.0.0",
+    "rollup": "4.64.5",
+    "typescript": "7.0.2"
   },
   "scripts": {
-    "clean": "rimraf dist",
-    "build": "npm run clean && node scripts/build.js",
-    "docs": "rimraf docs && typedoc --name justcore --readme ./README.md --out ./docs --excludeExternals --excludePrivate --excludeProtected --tsconfig tdconfig.json --theme ./docs-theme --includeDeclarations"
+    "clean": "node -e \"for (const d of ['dist','.build']) require('fs').rmSync(d,{recursive:true,force:true})\"",
+    "build": "npm run clean && tsc -p tsconfig.build.json && rollup -c",
+    "pretest": "node -e \"for (const d of ['.test-build']) require('fs').rmSync(d,{recursive:true,force:true})\" && tsc -p tsconfig.test.json",
+    "test": "jasmine --config=jasmine.json",
+    "test:package": "tsc -p tests/package/tsconfig.json && node tests/package/smoke.mjs",
+    "docs": "npm --prefix tools/docs ci && npm --prefix tools/docs run build"
   }
 }

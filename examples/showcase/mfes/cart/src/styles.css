@@ -1,0 +1,30 @@
+/* Release 2.0: the shop's new look. Uses the shell's design tokens (--surface, --text, --muted, --border, --bg). */
+.cart { --v2: linear-gradient(135deg, #7c3aed, #db2777); }
+.cart__head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.cart__head h2 { margin: 0; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; }
+.cart__count {
+    display: grid; place-items: center; min-width: 24px; height: 24px; padding: 0 7px; border-radius: 999px;
+    background: var(--v2); color: #fff; font-size: 0.8rem; font-weight: 800; font-variant-numeric: tabular-nums;
+}
+.cart__empty { margin: 0; padding: 14px; border-radius: 14px; background: var(--bg); color: var(--muted); }
+.cart__shipping { display: grid; gap: 6px; margin-bottom: 14px; font-size: 0.8rem; color: var(--muted); }
+.cart__meter { height: 6px; border-radius: 999px; background: var(--bg); overflow: hidden; }
+.cart__meter::before { content: ""; display: block; height: 100%; width: var(--progress); background: var(--v2); transition: width 0.3s; }
+.cart__lines { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 12px; }
+.cart__line { display: grid; grid-template-columns: 40px 1fr auto; gap: 4px 12px; align-items: center; }
+.cart__swatch {
+    grid-row: 1 / span 2; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px;
+    background: linear-gradient(160deg, var(--accent), color-mix(in srgb, var(--accent) 40%, #000)); color: #fff; font-weight: 800;
+}
+.cart__name { font-weight: 700; }
+.cart__stepper { grid-column: 2; justify-self: start; display: inline-flex; align-items: center; gap: 2px; padding: 2px; border-radius: 999px; background: var(--bg); }
+.cart__stepper button { width: 24px; height: 24px; border: 0; border-radius: 999px; background: var(--surface); color: inherit; font: inherit; font-weight: 700; cursor: pointer; }
+.cart__stepper output { min-width: 22px; text-align: center; font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cart__price { grid-column: 3; grid-row: 1 / span 2; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cart__total { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 0; border-top: 2px dotted var(--border); margin-bottom: 12px; }
+.cart__total strong { font-size: 1.3rem; font-weight: 800; }
+.cart__checkout {
+    width: 100%; padding: 12px 16px; border: 0; border-radius: 999px; cursor: pointer;
+    font: inherit; font-weight: 700; color: #fff; background: var(--v2); box-shadow: 0 10px 24px -10px #db2777;
+}
+@media (prefers-reduced-motion: reduce) { .cart__meter::before { transition: none; } }

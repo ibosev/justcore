@@ -3,29 +3,32 @@ const errorCodes = {
     m2: () => "use(): extensions must be passed as an array",
     m3: () => "use(): extension must be an object",
     m4: () => "use(): extension name must be a non empty string",
-    m5: id => `use(): "${id}" install must be a function`,
-    m6: id => `use(): "${id}" has already been used`,
+    m5: (id: string) => `use(): "${id}" install must be a function`,
+    m6: (id: string) => `use(): "${id}" has already been used`,
     m7: () => "init(): core has already been initialized",
     m8: () => "addModule(): id must be a non empty string",
-    m9: id => `addModule(): "${id}" has already been added`,
-    m10: id => `addModule(): "${id}" factory must be a function`,
+    m9: (id: string) => `addModule(): "${id}" has already been added`,
+    m10: (id: string) => `addModule(): "${id}" factory must be a function`,
     m11: () => "startModule(): core must be initialized first",
-    m12: id => `startModule(): "${id}" not found`,
-    m13: id => `startModule(): "${id}"'s sandbox property must be a Sandbox instance`,
-    m14: id => `startModule(): "${id}" init hook must be defined`,
-    m15: id => `startModule(): "${id}" destroy hook must be defined`,
+    m12: (id: string) => `startModule(): "${id}" not found`,
+    m13: (id: string) => `startModule(): "${id}"'s sandbox property must be the sandbox passed to its factory`,
+    m14: (id: string) => `startModule(): "${id}" init hook must be defined`,
+    m15: (id: string) => `startModule(): "${id}" destroy hook must be defined`,
     m16: () => "createHook(): type must be a non empty string",
-    m17: id => `createHook(): "${id}" method must be a function`,
+    m17: (id: string) => `createHook(): "${id}" method must be a function`,
     m18: () => "addPlugin(): hook type must be a non empty string",
-    m19: id => `addPlugin(): "${id}" plugin must be a function`,
+    m19: (id: string) => `addPlugin(): "${id}" plugin must be a function`,
     m20: () => "onMessage(): message type must be a non empty string",
-    m21: id => `onMessage(): "${id}" handler should be a function`,
+    m21: (id: string) => `onMessage(): "${id}" handler should be a function`,
     m22: () => "publishAsync(): message must be an object",
-    m23: id => `"${id}" moduleDidReceiveMessage hook must be defined in order to subscribe`,
+    m23: (id: string) => `"${id}" moduleDidReceiveMessage hook must be defined in order to subscribe`,
     m24: () => "addService(): key must be a non empty string",
-    m25: key => `addService(): "${key}" has already been added`,
-    m26: key => `addService(): "${key}" factory must be a function that returns service instance`,
-    m27: key => `getService(): ${key} service not found`,
+    m25: (key: string) => `addService(): "${key}" has already been added`,
+    m26: (key: string) => `addService(): "${key}" factory must be a function that returns service instance`,
+    m27: (key: string) => `getService(): ${key} service not found`,
+    m28: () => "remoteModule(): load must be a function",
+    m29: () => "remoteModule(): loaded code must export a module factory as its default export",
+    m30: (id: string) => `startModule(): "${id}" factory must return a module object`,
 };
 
 type ErrorCode = keyof typeof errorCodes;
@@ -82,4 +85,15 @@ let lastUID = 0;
 
 export function uid(): number {
     return ++lastUID;
+}
+
+export function noop(): void { /* intentionally empty */ }
+
+/** Runs next after value settles: synchronously for plain values, chained for promises and thenables. */
+export function then<T>(value: unknown, next: (value: any) => T): T | Promise<T> {
+    return isThenable(value) ? Promise.resolve(value).then(next) : next(value);
+}
+
+export function isThenable(value: unknown): value is PromiseLike<unknown> {
+    return !!value && typeof (value as PromiseLike<unknown>).then === "function";
 }

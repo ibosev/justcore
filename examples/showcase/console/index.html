@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Deployment console</title>
+    <link rel="icon" href="data:," />
+    <style>
+        :root {
+            --bg: #f5f5f4; --surface: #ffffff; --text: #1c1917; --muted: #78716c; --border: #e7e5e4;
+            --accent: #4f46e5; --on-accent: #ffffff; --live: #2f855a; --error: #dc2626;
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+            color: var(--text); background: var(--bg);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root { --bg: #0c0a09; --surface: #1c1917; --text: #f5f5f4; --muted: #a8a29e; --border: #292524; --accent: #818cf8; --on-accent: #0c0a09; --live: #68d391; --error: #fca5a5; }
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--bg); }
+        main { max-width: 960px; margin: 0 auto; padding: 32px 16px; }
+        h1 { font-size: 1.4rem; margin: 0 0 6px; }
+        p { color: var(--muted); margin: 0 0 20px; line-height: 1.5; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { text-align: left; color: var(--muted); font-weight: 500; padding: 10px 12px; }
+        td { padding: 10px 12px; border-top: 1px solid var(--border); vertical-align: middle; }
+        .live { color: var(--live); font-weight: 600; }
+        code { font-size: 0.8rem; color: var(--muted); overflow-wrap: anywhere; }
+        select, button { font: inherit; color: inherit; border-radius: 8px; padding: 6px 10px; border: 1px solid var(--border); background: var(--surface); }
+        select { max-width: 100%; }
+        button { cursor: pointer; font-weight: 600; }
+        button.publish { background: var(--accent); color: var(--on-accent); border: 0; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .status { min-height: 1.5em; margin-top: 16px; font-size: 0.9rem; }
+        .status[data-kind="error"] { color: var(--error); }
+        .bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        @media (max-width: 640px) {
+            thead { display: none; }
+            tr { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; padding: 12px; }
+            tr + tr { border-top: 1px solid var(--border); }
+            td { padding: 0; border: 0; }
+            td:nth-child(2) { text-align: right; }
+            td:nth-child(n + 3) { grid-column: 1 / -1; }
+            select { width: 100%; }
+        }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Deployment console</h1>
+    <p>
+        Pick the build each micro frontend should run, and publish it. Publishing moves one pointer in the live import map:
+        new page loads get that build at once, and open pages swap to it within a few seconds. Older builds stay on the CDN,
+        so going back is the same action. To ship a release of several micro frontends together, pick a version for all of
+        them and publish all changes in one step.
+    </p>
+    <div class="bar">
+        <span id="summary"></span>
+        <span class="actions">
+            <select id="version" aria-label="Pick this version for every micro frontend that has it"></select>
+            <button type="button" class="publish" id="publish-all" disabled>Publish all changes</button>
+            <button type="button" id="refresh">Refresh</button>
+        </span>
+    </div>
+    <div class="card">
+        <table>
+            <thead><tr><th>Micro frontend</th><th>Live</th><th>Build to publish</th><th></th></tr></thead>
+            <tbody id="rows"><tr><td colspan="4">Loading…</td></tr></tbody>
+        </table>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+</main>
+<script type="module">
+    const rows = document.getElementById("rows");
+    const status = document.getElementById("status");
+    const summary = document.getElementById("summary");
+    const versionPicker = document.getElementById("version");
+    const publishAll = document.getElementById("publish-all");
+    // One entry per row: what is live and what is selected.
+    let picks = [];
+
+    const el = (tag, props = {}, ...children) => {
+        const node = Object.assign(document.createElement(tag), props);
+        node.append(...children.filter(Boolean));
+        return node;
+    };
+    const say = (text, kind = "info") => {
+        status.textContent = text;
+        status.dataset.kind = kind;
+    };
+    const time = iso => new Date(iso).toLocaleString([], { dateStyle: "short", timeStyle: "medium" });
+
+    async function load() {
+        const response = await fetch("/api/builds", { cache: "no-store" });
+        const { live, builds } = await response.json();
+        picks = [];
+        rows.replaceChildren(...Object.entries(builds).map(([id, list]) => {
+            const current = live[id];
+            const select = el("select", { ariaLabel: `Build of ${id} to publish` },
+                ...list.map(build => el("option", {
+                    value: build.file,
+                    selected: build.file === current,
+                    textContent: `${build.version} · ${build.file.split("/").pop()} · built ${time(build.builtAt)}${build.file === current ? " (live)" : ""}`
+                })));
+            const button = el("button", { type: "button", className: "publish", textContent: "Publish" });
+            const sync = () => {
+                button.disabled = select.value === current;
+                publishAll.disabled = picks.every(pick => pick.select.value === pick.current);
+            };
+            picks.push({ id, current, list, select, sync });
+            select.addEventListener("change", sync);
+            button.addEventListener("click", () => publish([{ id, file: select.value }], button));
+            sync();
+            const version = list.find(build => build.file === current)?.version;
+            return el("tr", {},
+                el("td", { textContent: id }),
+                el("td", {}, el("span", { className: "live", textContent: version ?? "not published" }), el("br"), el("code", { textContent: current?.split("/").pop() ?? "" })),
+                el("td", {}, select),
+                el("td", {}, button));
+        }));
+        summary.textContent = `${Object.keys(builds).length} micro frontends, ${Object.values(builds).flat().length} builds on the CDN`;
+        const newestFirst = (a, b) => b.localeCompare(a, undefined, { numeric: true });
+        const versions = [...new Set(Object.values(builds).flat().map(build => build.version))].sort(newestFirst);
+        versionPicker.replaceChildren(el("option", { value: "", textContent: "Pick a version for all…" }),
+            ...versions.map(version => el("option", { value: version, textContent: `${version} for all (${picks.filter(pick => pick.list.some(build => build.version === version)).length} have it)` })));
+        picks.forEach(pick => pick.sync());
+    }
+
+    async function publish(targets, button) {
+        button.disabled = true;
+        say(`Publishing ${targets.map(({ id, file }) => `${id} ${file}`).join(", ")}…`);
+        const response = await fetch("/api/publish", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ targets })
+        });
+        const result = await response.json();
+        if (response.ok) {
+            say(`${result.lines.join("; ")}. Open pages swap within a few seconds.`);
+        } else {
+            say(result.error, "error");
+        }
+        await load();
+    }
+
+    versionPicker.addEventListener("change", () => {
+        for (const pick of picks) {
+            // The newest build of that version; micro frontends without one keep their selection.
+            const build = pick.list.find(each => each.version === versionPicker.value);
+            if (build) {
+                pick.select.value = build.file;
+            }
+            pick.sync();
+        }
+    });
+    publishAll.addEventListener("click", () => publish(picks
+        .filter(pick => pick.select.value !== pick.current)
+        .map(pick => ({ id: pick.id, file: pick.select.value })), publishAll));
+    document.getElementById("refresh").addEventListener("click", () => load().then(() => say("")));
+    load().catch(error => say(String(error), "error"));
+</script>
+</body>
+</html>

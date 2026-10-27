@@ -1,0 +1,38 @@
+/* Release 2.0: the shop's new look. Uses the shell's design tokens (--surface, --text, --muted, --border, --bg). */
+.detail { --v2: linear-gradient(135deg, #7c3aed, #db2777); display: grid; gap: 16px; }
+.detail__tile {
+    position: relative; display: grid; place-items: center; aspect-ratio: 16 / 10; border-radius: 18px; overflow: hidden;
+    background:
+        radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.35), transparent 55%),
+        linear-gradient(160deg, var(--accent), color-mix(in srgb, var(--accent) 40%, #000));
+    box-shadow: 0 12px 30px -12px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.detail__initial { color: #fff; font-size: 4.5rem; font-weight: 800; letter-spacing: -0.04em; text-shadow: 0 6px 20px rgb(0 0 0 / 0.25); }
+.detail__category {
+    position: absolute; top: 12px; left: 12px; padding: 3px 10px; border-radius: 999px;
+    background: rgb(255 255 255 / 0.9); color: #1c1917; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.detail__body { display: grid; gap: 10px; }
+.detail h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin: 0; }
+.detail p { margin: 0; color: var(--muted); line-height: 1.5; }
+.detail__buy { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.detail__price { font-size: 1.6rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.detail__stepper { display: inline-flex; align-items: center; gap: 4px; padding: 3px; border-radius: 999px; background: var(--bg); }
+.detail__stepper button {
+    width: 32px; height: 32px; border: 0; border-radius: 999px; background: var(--surface); color: inherit;
+    font: inherit; font-weight: 700; cursor: pointer; box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+}
+.detail__stepper output { min-width: 26px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.detail__add {
+    width: 100%; padding: 12px 16px; border: 0; border-radius: 999px; cursor: pointer;
+    font: inherit; font-weight: 700; color: #fff; background: var(--v2);
+    box-shadow: 0 10px 24px -10px #db2777; transition: transform 0.15s;
+}
+.detail__add:hover { transform: translateY(-1px); }
+.detail__add:active { transform: translateY(1px); }
+.detail p.detail__confirmed { min-height: 1.5em; color: #16a34a; font-weight: 600; font-size: 0.9rem; }
+.detail__empty { display: flex; align-items: center; gap: 12px; padding: 18px; border: 2px dashed var(--border); border-radius: 18px; color: var(--muted); }
+.detail__empty span { font-size: 1.5rem; }
+.detail__empty p { margin: 0; }
+@media (prefers-color-scheme: dark) { .detail p.detail__confirmed { color: #4ade80; } }
+@media (prefers-reduced-motion: reduce) { .detail__add { transition: none; } }

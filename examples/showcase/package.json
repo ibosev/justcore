@@ -1,0 +1,23 @@
+{
+  "name": "justcore-showcase",
+  "private": true,
+  "type": "module",
+  "description": "Independently built micro frontends in React, Vue, Svelte, SolidJS, Angular and Astro, loaded from a CDN into one justcore shell.",
+  "workspaces": [
+    "contracts",
+    "vendor",
+    "mfes/*",
+    "shell"
+  ],
+  "scripts": {
+    "build:mfes": "npm run build --workspace vendor && npm run build --workspace mfes/navigation --workspace mfes/header --workspace mfes/catalog --workspace mfes/product-detail --workspace mfes/cart --workspace mfes/recommendations",
+    "build": "npm run build:mfes && node scripts/publish.mjs header navigation catalog product-detail cart recommendations && npm run build --workspace shell",
+    "build:faults": "SHOWCASE_FAULT=start SHOWCASE_VERSION=2.1.0 npm run build --workspace mfes/recommendations && SHOWCASE_FAULT=click SHOWCASE_VERSION=2.1.0 npm run build --workspace mfes/product-detail",
+    "test": "node --test \"scripts/*.test.mjs\" && npm run test --workspaces --if-present",
+    "check": "npm run check --workspaces --if-present",
+    "start": "node serve.mjs"
+  },
+  "devDependencies": {
+    "es-module-lexer": "3.0.4"
+  }
+}

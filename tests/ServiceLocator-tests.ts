@@ -59,4 +59,14 @@ describe("ServiceLocator", () => {
 
         expect(service).toBe(this.locator.getService("service"));
     });
+
+    it("should create falsy services only once", function (this: TestsContext): void {
+        const factory = jasmine.createSpy("factory").and.returnValue(0);
+        this.locator.addService("zero", factory);
+
+        this.locator.getService("zero");
+        this.locator.getService("zero");
+
+        expect(factory).toHaveBeenCalledTimes(1);
+    });
 });

@@ -1,0 +1,32 @@
+{
+  "name": "@showcase/vendor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared framework libraries, built once to the CDN and loaded by every micro frontend through the import map. Owned by the platform team.",
+  "exports": {
+    "./plugin": "./plugin.mjs"
+  },
+  "scripts": {
+    "build": "vite build",
+    "test": "node --test \"*.test.mjs\""
+  },
+  "dependencies": {
+    "@angular/common": "22.2.3",
+    "@angular/core": "22.2.3",
+    "@angular/platform-browser": "22.2.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "rxjs": "7.8.2",
+    "solid-js": "1.9.17",
+    "svelte": "5.57.2",
+    "tslib": "2.8.1",
+    "vue": "3.5.43"
+  },
+  "devDependencies": {
+    "@angular/compiler": "22.2.3",
+    "@angular/compiler-cli": "22.2.3",
+    "@babel/core": "8.0.1",
+    "vite": "8.3.4"
+  }
+}

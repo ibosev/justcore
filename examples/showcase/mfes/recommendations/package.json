@@ -1,0 +1,32 @@
+{
+  "name": "@showcase/mfe-recommendations",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Recommendations micro frontend (Angular). Shows products related to the one in the URL and asks the cart to add them.",
+  "scripts": {
+    "build": "vite build",
+    "test": "node --test \"src/*.test.ts\"",
+    "check": "ngc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@angular/common": "22.2.3",
+    "@angular/compiler": "22.2.3",
+    "@angular/core": "22.2.3",
+    "@angular/platform-browser": "22.2.3",
+    "nanostores": "1.5.5",
+    "rxjs": "7.8.2",
+    "tslib": "2.8.1"
+  },
+  "devDependencies": {
+    "@analogjs/vite-plugin-angular": "2.9.1",
+    "@angular/build": "22.2.3",
+    "@angular/compiler-cli": "22.2.3",
+    "@showcase/contracts": "1.0.0",
+    "@showcase/vendor": "1.0.0",
+    "@types/node": "24.10.1",
+    "justcore": "file:../../../..",
+    "typescript": "6.0.3",
+    "vite": "8.3.4"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "strict": true,
+    // @nanostores/vue ships declarations that fail under strict vue-tsc; check our code, not theirs.
+    "skipLibCheck": true,
+    "types": ["vite/client", "node"]
+  },
+  "include": ["src"]
+}

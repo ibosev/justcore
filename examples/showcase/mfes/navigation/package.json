@@ -1,0 +1,29 @@
+{
+  "name": "@showcase/mfe-navigation",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Site navigation micro frontend (React). Reads and changes the URL path through the shell's location service.",
+  "scripts": {
+    "build": "vite build",
+    "test": "node --test \"src/*.test.ts\"",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nanostores/react": "2.0.1",
+    "nanostores": "1.5.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@showcase/contracts": "1.0.0",
+    "@showcase/vendor": "1.0.0",
+    "@types/node": "24.10.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "justcore": "file:../../../..",
+    "typescript": "6.0.3",
+    "vite": "8.3.4"
+  }
+}

@@ -1,0 +1,50 @@
+declare const errorCodes: {
+    m1: () => string;
+    m2: () => string;
+    m3: () => string;
+    m4: () => string;
+    m5: (id: string) => string;
+    m6: (id: string) => string;
+    m7: () => string;
+    m8: () => string;
+    m9: (id: string) => string;
+    m10: (id: string) => string;
+    m11: () => string;
+    m12: (id: string) => string;
+    m13: (id: string) => string;
+    m14: (id: string) => string;
+    m15: (id: string) => string;
+    m16: () => string;
+    m17: (id: string) => string;
+    m18: () => string;
+    m19: (id: string) => string;
+    m20: () => string;
+    m21: (id: string) => string;
+    m22: () => string;
+    m23: (id: string) => string;
+    m24: () => string;
+    m25: (key: string) => string;
+    m26: (key: string) => string;
+    m27: (key: string) => string;
+    m28: () => string;
+    m29: () => string;
+    m30: (id: string) => string;
+};
+type ErrorCode = keyof typeof errorCodes;
+declare class ArgumentGuard {
+    array(arg: any[], code: ErrorCode, formatId?: string): this;
+    object(arg: any, code: ErrorCode, formatId?: string): this;
+    function(arg: (...args: any[]) => any, code: ErrorCode, formatId?: string): this;
+    nonEmptyString(arg: string, code: ErrorCode, formatId?: string): this;
+    true(arg: boolean, code: ErrorCode, formatId?: string): this;
+    false(arg: boolean, code: ErrorCode, formatId?: string): this;
+}
+export declare const guard: ArgumentGuard;
+export declare function isDocumentReady(): boolean;
+export declare const hasOwnProperty: (v: PropertyKey) => boolean;
+export declare function uid(): number;
+export declare function noop(): void;
+/** Runs next after value settles: synchronously for plain values, chained for promises and thenables. */
+export declare function then<T>(value: unknown, next: (value: any) => T): T | Promise<T>;
+export declare function isThenable(value: unknown): value is PromiseLike<unknown>;
+export {};

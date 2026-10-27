@@ -23,6 +23,10 @@ You can find full API documentation [here](https://valentin-lozev.github.io/just
 * [Module](https://valentin-lozev.github.io/justcore/interfaces/core.__global.jc.module.html)
 * [Extension](https://valentin-lozev.github.io/justcore/interfaces/core.__global.jc.extension.html)
 
+### Showcase
+
+[`examples/showcase`](examples/showcase/README.md) loads six independently deployed micro frontends, written in React, Vue, Svelte, SolidJS, Angular and Astro, from a CDN into one justcore core. They share URL state and talk over the message bus.
+
 ### Basic usage
 
 *app.js*
@@ -83,10 +87,21 @@ export class SearchModule {
 }
 ```
 
+### Lifecycle
+
+`init` and `destroy` may return a promise, and so may a module factory, e.g. one that downloads the module's code first (see `remoteModule`). `startModule` resolves once the module has started and rejects with the error if it failed to start; `stopModule` resolves once it has stopped. Each sandbox also has a `signal` that aborts when its module stops, so listeners and requests tied to it are released even if `destroy` throws:
+
+```javascript
+init(props) {
+  this.input = props.root.querySelector('input');
+  this.input.addEventListener('change', this.handleInputChanged, { signal: this.sandbox.signal });
+}
+```
+
 ## Core concepts
 
 <p align="center">
-  <img alt="justcore flow" src="https://github.com/valentin-lozev/justcore/blob/master/docs/assets/images/justcore-diagram.png" />
+  <img alt="justcore flow" src="media/justcore-diagram.png" />
 </p>
 
 ### Modules

@@ -1,0 +1,68 @@
+{
+  "products": [
+    {
+      "id": "aria-headphones",
+      "name": "Aria Headphones",
+      "category": "audio",
+      "price": 24900,
+      "color": "#4f46e5",
+      "description": "Over-ear, noise cancelling, 40 hours of battery."
+    },
+    {
+      "id": "pebble-speaker",
+      "name": "Pebble Speaker",
+      "category": "audio",
+      "price": 8900,
+      "color": "#0891b2",
+      "description": "Pocket-sized speaker that survives the beach."
+    },
+    {
+      "id": "studio-buds",
+      "name": "Studio Buds",
+      "category": "audio",
+      "price": 14900,
+      "color": "#7c3aed",
+      "description": "True wireless earbuds with transparency mode."
+    },
+    {
+      "id": "pulse-watch",
+      "name": "Pulse Watch",
+      "category": "wearables",
+      "price": 32900,
+      "color": "#dc2626",
+      "description": "Heart rate, GPS and a week between charges."
+    },
+    {
+      "id": "loop-band",
+      "name": "Loop Band",
+      "category": "wearables",
+      "price": 5900,
+      "color": "#ea580c",
+      "description": "A fitness band that forgets it is there."
+    },
+    {
+      "id": "halo-ring",
+      "name": "Halo Ring",
+      "category": "wearables",
+      "price": 19900,
+      "color": "#ca8a04",
+      "description": "Sleep and recovery tracking in a titanium ring."
+    },
+    {
+      "id": "glow-lamp",
+      "name": "Glow Lamp",
+      "category": "home",
+      "price": 7900,
+      "color": "#16a34a",
+      "description": "Warm dimmable light that follows the sunset."
+    },
+    {
+      "id": "nimbus-hub",
+      "name": "Nimbus Hub",
+      "category": "home",
+      "price": 12900,
+      "color": "#2563eb",
+      "description": "One hub for every smart device in the house."
+    }
+  ]
+}

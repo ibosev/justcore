@@ -1,0 +1,40 @@
+---
+import { infoOf, type ModuleId } from "../app/registry.ts";
+import "../styles/global.css";
+
+// Each region is one module's root. Labels and states are drawn by CSS from these attributes.
+const region = (id: ModuleId) => ({
+    "data-module": id,
+    "data-framework": infoOf(id).framework,
+    "data-source": infoOf(id).remote ? "CDN" : "shell",
+    "data-state": "loading"
+});
+---
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="color-scheme" content="light dark" />
+        <!-- The shell's server replaces the placeholder with the live import map on every request. -->
+        <script type="importmap" is:inline set:html="__IMPORT_MAP__" />
+        <title>justcore showcase</title>
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Ctext x='16' y='21' font-family='sans-serif' font-size='14' font-weight='700' fill='white' text-anchor='middle'%3Ejc%3C/text%3E%3C/svg%3E" />
+    </head>
+    <body>
+        <div class="shell">
+            <header class="region region--header" {...region("header")}></header>
+            <nav class="region region--nav" aria-label="Categories" {...region("navigation")}></nav>
+            <main class="region region--catalog" {...region("catalog")}></main>
+            <div class="column">
+                <section class="region" aria-label="Product details" {...region("product-detail")}></section>
+                <section class="region" aria-label="Recommendations" {...region("recommendations")}></section>
+                <aside class="region" aria-label="Cart" {...region("cart")}></aside>
+            </div>
+            <section class="region region--inspector" aria-label="Inspector" {...region("inspector")}></section>
+        </div>
+        <script>
+            import "../app/main.ts";
+        </script>
+    </body>
+</html>

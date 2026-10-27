@@ -1,0 +1,26 @@
+{
+  "name": "@showcase/mfe-product-detail",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Product detail micro frontend (Svelte). Reads the selected product from the URL, fetches it from the product API, asks the cart to add it.",
+  "scripts": {
+    "build": "vite build",
+    "test": "node --test \"src/*.test.ts\"",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "dependencies": {
+    "nanostores": "1.5.5",
+    "svelte": "5.57.2"
+  },
+  "devDependencies": {
+    "@showcase/contracts": "1.0.0",
+    "@showcase/vendor": "1.0.0",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@types/node": "24.10.1",
+    "justcore": "file:../../../..",
+    "svelte-check": "4.7.6",
+    "typescript": "6.0.3",
+    "vite": "8.3.4"
+  }
+}

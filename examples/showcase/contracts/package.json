@@ -1,0 +1,11 @@
+{
+  "name": "@showcase/contracts",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Types only: the services, shared values and messages the shell and micro frontends agree on. No runtime code, so nothing here has to be a singleton.",
+  "types": "index.d.ts",
+  "peerDependencies": {
+    "justcore": "*",
+    "nanostores": "^1.0.0"
+  }
+}

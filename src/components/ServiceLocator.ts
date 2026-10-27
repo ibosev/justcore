@@ -2,7 +2,7 @@ import { guard, hasOwnProperty } from "../utils";
 
 export class ServiceLocator implements jc.ServiceLocator {
 
-    private readonly container: Record<string, { instance: any; factory: () => any; }>;
+    private readonly container: Record<string, { instance: any; created: boolean; factory: () => any; }>;
     private instantiationsStack: string[];
 
     constructor() {
@@ -17,7 +17,8 @@ export class ServiceLocator implements jc.ServiceLocator {
 
         this.container[key] = {
             factory: factory,
-            instance: null
+            instance: null,
+            created: false
         };
     }
 
@@ -25,7 +26,7 @@ export class ServiceLocator implements jc.ServiceLocator {
         const serviceData = this.container[key];
         guard.true(!!serviceData, "m27", key);
 
-        if (serviceData.instance) {
+        if (serviceData.created) {
             return serviceData.instance;
         }
 
@@ -37,6 +38,7 @@ export class ServiceLocator implements jc.ServiceLocator {
 
         try {
             serviceData.instance = serviceData.factory();
+            serviceData.created = true;
         } finally {
             this.instantiationsStack.pop();
         }

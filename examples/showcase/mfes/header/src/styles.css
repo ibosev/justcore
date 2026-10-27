@@ -1,0 +1,37 @@
+/* Release 2.0: the shop's new look. Uses the shell's design tokens (--surface, --text, --muted, --border, --bg). */
+.header { --v2: linear-gradient(135deg, #7c3aed, #db2777); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+.header__brand { display: flex; align-items: center; gap: 14px; }
+.header__name {
+    display: block; font-size: 1.35rem; font-weight: 800; letter-spacing: -0.03em;
+    background: var(--v2); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.header__logo {
+    display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; transform: rotate(-6deg);
+    background: var(--v2); color: #fff; font-weight: 800; box-shadow: 0 10px 24px -10px #db2777;
+}
+.header__tagline, .header__muted { color: var(--muted); font-size: 0.85rem; }
+.header__search {
+    flex: 1 1 200px; max-width: 380px; display: flex; align-items: center; gap: 8px; padding: 0 16px;
+    background: var(--bg); border: 2px solid transparent; border-radius: 999px; color: var(--muted);
+}
+.header__search:focus-within { border-color: #a855f7; }
+.header__search input { flex: 1; min-width: 0; padding: 10px 0; font: inherit; color: var(--text); background: none; border: 0; outline: none; }
+.header__cart {
+    display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 16px; border-radius: 999px;
+    background: var(--text); color: var(--surface); font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.header__badge {
+    display: grid; place-items: center; min-width: 30px; height: 30px; padding: 0 8px; border-radius: 999px;
+    background: var(--v2); color: #fff; font-weight: 800; animation: header-pop 0.3s ease-out;
+}
+.header__cart .header__muted { color: inherit; padding-right: 10px; }
+.header__toasts { position: fixed; right: 16px; bottom: 16px; z-index: 10; display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.header__toast {
+    display: flex; gap: 10px; align-items: center; padding: 12px 16px; border-radius: 14px;
+    background: var(--surface); color: var(--text); border: 1px solid var(--border); border-left: 5px solid #db2777;
+    box-shadow: 0 12px 32px rgb(0 0 0 / 0.18); animation: header-toast-in 0.25s ease-out;
+}
+.header__toast span { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 999px; background: var(--v2); color: #fff; font-size: 0.75rem; }
+@keyframes header-toast-in { from { transform: translateX(24px); opacity: 0; } }
+@keyframes header-pop { 50% { transform: scale(1.25); } }
+@media (prefers-reduced-motion: reduce) { .header__toast, .header__badge { animation: none; } }

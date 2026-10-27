@@ -2,7 +2,7 @@ import { guard, uid } from "../utils";
 
 interface SubscribersMap {
     [messageType: string]: {
-        [subscriptionId: number]: jc.MessageHandler;
+        [subscriptionId: string]: jc.MessageHandler;
     };
 }
 
@@ -27,12 +27,18 @@ export class MessageBus {
 
         const subscriptions = this._subscribers[message.type];
         Object.keys(subscriptions).forEach(id => {
-            this._publishSingle(message, subscriptions[id]);
+            this._publishSingle(message, subscriptions, id);
         });
     }
 
-    private _publishSingle(message: jc.Message, handler: jc.MessageHandler): void {
+    private _publishSingle(message: jc.Message, subscriptions: SubscribersMap[string], id: string): void {
         setTimeout(() => {
+            // Look the handler up at delivery time: it may have unsubscribed after publish.
+            const handler = subscriptions[id];
+            if (!handler) {
+                return;
+            }
+
             try {
                 handler(message);
             } catch (err) {
@@ -51,7 +57,6 @@ export class MessageBus {
         this._subscribers[type][subscriptionId] = handler;
 
         return () => {
-            this._subscribers[type][subscriptionId] = null;
             delete this._subscribers[type][subscriptionId];
         };
     }

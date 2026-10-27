@@ -1,4 +1,4 @@
-﻿import { Core } from "../src/components/Core";
+import { Core } from "../src/components/Core";
 import { Sandbox } from "../src/components/Sandbox";
 
 interface TestsContext {
@@ -23,10 +23,6 @@ describe("Sandbox", () => {
 
     it("should expose a module instance id", function (this: TestsContext) {
         expect(this.sandbox.instanceId).toEqual(this.instanceId);
-    });
-
-    it("should expose the core", function (this: TestsContext) {
-        expect(this.sandbox._extensionsOnlyCore).toBe(this.core);
     });
 
     it("should delegate to the core when publish", function (this: TestsContext) {

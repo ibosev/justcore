@@ -1,0 +1,24 @@
+---
+// A page partial: rendered at build time to dist/fragment.html, without <html> or <body>, and inlined
+// into the catalog bundle. Zero framework JavaScript; the data comes from the product API.
+import data from "../../../../api/products.json";
+
+export const partial = true;
+
+const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+---
+<ul class="catalog">
+    {data.products.map(product => (
+        <li class="catalog__card" data-product-id={product.id} data-category={product.category} data-name={product.name.toLowerCase()}>
+            <button type="button" class="catalog__button">
+                <span class="catalog__tile" style={`--accent: ${product.color}`}>
+                    {product.name.charAt(0)}
+                    <span class="catalog__price">{currency.format(product.price / 100)}</span>
+                </span>
+                <span class="catalog__name">{product.name}</span>
+                <span class="catalog__meta">{product.category}</span>
+            </button>
+        </li>
+    ))}
+</ul>
+<p class="catalog__none" hidden>No products match.</p>

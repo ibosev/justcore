@@ -1,0 +1,14 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "justcore",
+  "entryPoints": [
+    "entry.ts"
+  ],
+  "tsconfig": "tsconfig.json",
+  "readme": "../../README.md",
+  "out": "../../docs",
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "treatWarningsAsErrors": true
+}

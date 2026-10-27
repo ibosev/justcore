@@ -1,0 +1,24 @@
+/* Release 2.0: the shop's new look. Uses the shell's design tokens (--surface, --text, --muted, --border, --bg). */
+.catalog { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+.catalog__button {
+    display: grid; gap: 4px; width: 100%; padding: 8px 8px 12px; text-align: left; cursor: pointer;
+    font: inherit; color: inherit; background: var(--surface); border: 0; border-radius: 18px;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.08), 0 8px 24px -16px rgb(0 0 0 / 0.4); transition: transform 0.15s, box-shadow 0.15s;
+}
+.catalog__button:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgb(0 0 0 / 0.08), 0 16px 32px -16px rgb(0 0 0 / 0.5); }
+.catalog__card[data-selected] .catalog__button { box-shadow: 0 0 0 3px #db2777, 0 16px 32px -16px #db2777; }
+.catalog__tile {
+    position: relative; display: grid; place-items: center; aspect-ratio: 1; border-radius: 14px; margin-bottom: 6px;
+    background:
+        radial-gradient(circle at 30% 25%, rgb(255 255 255 / 0.35), transparent 55%),
+        linear-gradient(160deg, var(--accent), color-mix(in srgb, var(--accent) 40%, #000));
+    color: #fff; font-size: 2.8rem; font-weight: 800;
+}
+.catalog__price {
+    position: absolute; right: 8px; bottom: 8px; padding: 3px 10px; border-radius: 999px;
+    background: rgb(255 255 255 / 0.92); color: #1c1917; font-size: 0.8rem; font-weight: 800;
+}
+.catalog__name { padding: 0 4px; font-weight: 800; letter-spacing: -0.01em; }
+.catalog__meta { padding: 0 4px; color: var(--muted); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+.catalog__none { color: var(--muted); margin: 0; }
+@media (prefers-reduced-motion: reduce) { .catalog__button { transition: none; } }

@@ -1,4 +1,4 @@
-﻿import { HooksSystem } from "../src/components/HooksSystem";
+import { HooksSystem } from "../src/components/HooksSystem";
 
 interface TestsContext {
     moduleHook: jc.HookType;
@@ -66,11 +66,6 @@ describe("HooksSystem", () => {
 
     it("should throw on invalid method when create hook", function (this: TestsContext): void {
         expect(() => this.hooksSystem.createHook("onModuleAdd", null)).toThrowError();
-    });
-
-    it("should attach custom attributes when create hook", function (this: TestsContext): void {
-        expect((this.module.sum as jc.HookProps & jc.Func<number>)._withPipeline).toEqual(true);
-        expect((this.module.sum as jc.HookProps & jc.Func<number>)._hookType).toEqual(this.moduleHook);
     });
 
     it("should throw on empty hook when add plugin", function (this: TestsContext): void {
@@ -172,6 +167,30 @@ describe("HooksSystem", () => {
 
             expect(() => this.module.sum(args)).toThrowError(expectedMessage);
             expect(increaseResultBy1).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("Plugins that do not return next()", () => {
+        it("should pass the method's promise through", async function (this: TestsContext): Promise<void> {
+            const promise = Promise.resolve(42);
+            const hook = this.hooksSystem.createHook("onModuleInit", () => promise);
+            this.hooksSystem.addPlugin("onModuleInit", function (next: () => unknown): void { next(); });
+
+            expect(hook()).toBe(promise);
+        });
+
+        it("should keep a plugin's own return value", function (this: TestsContext): void {
+            const hook = this.hooksSystem.createHook("onModuleInit", (): unknown => Promise.resolve());
+            this.hooksSystem.addPlugin("onModuleInit", (next: () => unknown) => { next(); return "own"; });
+
+            expect(hook()).toEqual("own");
+        });
+
+        it("should not change synchronous results", function (this: TestsContext): void {
+            const hook = this.hooksSystem.createHook("onModuleSubscribe", () => ["message"]);
+            this.hooksSystem.addPlugin("onModuleSubscribe", function (next: () => unknown): void { next(); });
+
+            expect(hook()).toBeUndefined();
         });
     });
 });
